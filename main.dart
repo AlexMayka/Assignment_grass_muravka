@@ -11,17 +11,17 @@ List<AgriculturalMachinery> getAllMachine(Map mapBefore2010, Map mapAfter2010){
 
   List <AgriculturalMachinery> listMachinery = [];
 
-  mapBefore2010.values.expand((i) => i).forEach((territory){
-    territory.machineries.forEach((mechanism) {
+  for(var territory in mapBefore2010.values.expand((i) => i)){
+    for(var mechanism in territory.machineries){
       if (!listMachinery.contains(mechanism)) listMachinery.add(mechanism);
-    });
-  });
+    }
+  }
 
-  mapAfter2010.values.expand((i) => i).forEach((territory){
-    territory.machineries.forEach((mechanism) {
+  for(var territory in mapAfter2010.values.expand((i) => i)){
+    for(var mechanism in territory.machineries){
       if (!listMachinery.contains(mechanism)) listMachinery.add(mechanism);
-    });
-  });
+    }
+  }
 
   return listMachinery;
 }
@@ -29,28 +29,23 @@ List<AgriculturalMachinery> getAllMachine(Map mapBefore2010, Map mapAfter2010){
 double getMeanAge(List <AgriculturalMachinery> listMachinery){
   /**Функция для вычисления среднего возраста всей техники
    * Function to calculate the average age of all equipment*/
-  try {
-    double sumAge = 0;
-    listMachinery.forEach((machine) {sumAge += (DateTime.now().year - machine.releaseDate.year);});
-    return double.parse((sumAge / listMachinery.length).toStringAsFixed(2));
-  } catch (error) { return 0;}
+
+  if(listMachinery.isEmpty) return 0;
+  int sumAge = listMachinery.map((machine) => DateTime.now().year - machine.releaseDate.year).reduce((a, b) => a + b);
+  return double.parse((sumAge / listMachinery.length).toStringAsFixed(2));
 }
 
 double getMeanAgeOld(List <AgriculturalMachinery> listMachinery){
   /**Функция для вычисления среднего возраста 50% самой старой техники
    * Function to calculate the average age of the 50% oldest equipment*/
-  try {
-    double sumAge50 = 0;
-    listMachinery.sort((data1, data2) =>
-    data1.releaseDate.year - data2.releaseDate.year);
-    listMachinery.getRange(0, listMachinery.length ~/ 2).forEach((machine) {
-      sumAge50 += (DateTime
-          .now()
-          .year - machine.releaseDate.year);
-    });
-    return double.parse(
-        (sumAge50 / (listMachinery.length ~/ 2)).toStringAsFixed(2));
-  } catch (error) { return 0;}
+  
+  if(listMachinery.isEmpty) return 0;
+  listMachinery.sort((data1, data2) => data1.releaseDate.year - data2.releaseDate.year);
+
+  var oldestMachines = listMachinery.sublist(0, listMachinery.length ~/ 2);
+  var sumAge = oldestMachines.map((machine) => DateTime.now().year - machine.releaseDate.year).reduce((a, b) => a + b);
+
+  return double.parse((sumAge / oldestMachines.length).toStringAsFixed(2));
 }
 
 void main(){
